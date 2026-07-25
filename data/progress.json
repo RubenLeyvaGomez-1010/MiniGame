@@ -2,7 +2,7 @@
   "users": {
     "Ruben": {
       "username": "Ruben",
-      "bestScore": 79,
+      "bestScore": 87,
       "totalCorrect": 4,
       "totalIncorrect": 0,
       "highestStreak": 4,
@@ -12,7 +12,7 @@
         "speedster"
       ],
       "level": "Hero",
-      "lastPlayed": "2026-07-25T20:10:52.391Z"
+      "lastPlayed": "2026-07-25T20:18:40.029Z"
     }
   }
 }

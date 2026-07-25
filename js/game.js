@@ -1,4 +1,5 @@
 const USER_KEY = "mathSprintUser";
+const AGE_KEY = "mathSprintAgeGroup";
 
 class MathGame {
     constructor() {
@@ -9,6 +10,7 @@ class MathGame {
         this.attempts = 0;
 
         this.difficulty = "easy";
+        this.ageGroup = this.getStoredAgeGroup();
         this.currentQuestion = "";
         this.correctAnswer = null;
 
@@ -71,6 +73,24 @@ class MathGame {
             });
         });
 
+        document.querySelectorAll(".age-btn").forEach((button) => {
+            button.addEventListener("click", (event) => {
+                document.querySelectorAll(".age-btn").forEach((btn) => {
+                    btn.classList.remove("active");
+                });
+
+                event.target.classList.add("active");
+                this.ageGroup = event.target.dataset.ageGroup;
+                this.saveAgeGroup();
+                this.updateAgeNote();
+                this.syncDifficultySettings();
+                this.generateQuestion();
+            });
+        });
+
+        this.activateAgeGroupButton();
+        this.updateAgeNote();
+
         this.updateThemeButtonText();
         this.updateSoundButtonText();
     }
@@ -79,6 +99,43 @@ class MathGame {
         const stored = localStorage.getItem("mathGameBestScore");
         const parsed = Number(stored);
         return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    getStoredAgeGroup() {
+        const stored = localStorage.getItem(AGE_KEY);
+        if (stored === "6-8" || stored === "9-10" || stored === "11-12") {
+            return stored;
+        }
+        return "6-8";
+    }
+
+    saveAgeGroup() {
+        localStorage.setItem(AGE_KEY, this.ageGroup);
+    }
+
+    activateAgeGroupButton() {
+        document.querySelectorAll(".age-btn").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.ageGroup === this.ageGroup);
+        });
+    }
+
+    updateAgeNote() {
+        const ageNote = document.getElementById("ageNote");
+        if (!ageNote) {
+            return;
+        }
+
+        if (this.ageGroup === "6-8") {
+            ageNote.textContent = "Modo 6-8: numeros pequenos y mas tiempo.";
+            return;
+        }
+
+        if (this.ageGroup === "9-10") {
+            ageNote.textContent = "Modo 9-10: equilibrio entre rapidez y reto.";
+            return;
+        }
+
+        ageNote.textContent = "Modo 11-12: mas desafio y menos tiempo.";
     }
 
     saveBestScore() {
@@ -422,13 +479,19 @@ class MathGame {
     }
 
     syncDifficultySettings() {
-        if (this.difficulty === "easy") {
-            this.timePerQuestion = 12;
-        } else if (this.difficulty === "medium") {
-            this.timePerQuestion = 10;
-        } else {
-            this.timePerQuestion = 8;
-        }
+        const baseTimes = {
+            easy: 12,
+            medium: 10,
+            hard: 8
+        };
+
+        const ageDelta = this.ageGroup === "6-8"
+            ? 2
+            : this.ageGroup === "9-10"
+                ? 0
+                : -1;
+
+        this.timePerQuestion = Math.max(6, baseTimes[this.difficulty] + ageDelta);
     }
 
     generateQuestion() {
@@ -451,16 +514,27 @@ class MathGame {
         let answer;
         let question;
 
-        if (this.difficulty === "easy") {
-            num1 = Math.floor(Math.random() * 10) + 1;
-            num2 = Math.floor(Math.random() * 10) + 1;
-        } else if (this.difficulty === "medium") {
-            num1 = Math.floor(Math.random() * 20) + 2;
-            num2 = Math.floor(Math.random() * 20) + 2;
-        } else {
-            num1 = Math.floor(Math.random() * 30) + 2;
-            num2 = Math.floor(Math.random() * 12) + 2;
-        }
+        const numberRanges = {
+            "6-8": {
+                easy: { max1: 10, max2: 10, min1: 1, min2: 1 },
+                medium: { max1: 14, max2: 14, min1: 2, min2: 2 },
+                hard: { max1: 20, max2: 10, min1: 2, min2: 2 }
+            },
+            "9-10": {
+                easy: { max1: 12, max2: 12, min1: 1, min2: 1 },
+                medium: { max1: 20, max2: 20, min1: 2, min2: 2 },
+                hard: { max1: 30, max2: 12, min1: 2, min2: 2 }
+            },
+            "11-12": {
+                easy: { max1: 15, max2: 15, min1: 1, min2: 1 },
+                medium: { max1: 25, max2: 25, min1: 2, min2: 2 },
+                hard: { max1: 40, max2: 15, min1: 3, min2: 2 }
+            }
+        };
+
+        const selectedRange = numberRanges[this.ageGroup][this.difficulty];
+        num1 = Math.floor(Math.random() * selectedRange.max1) + selectedRange.min1;
+        num2 = Math.floor(Math.random() * selectedRange.max2) + selectedRange.min2;
 
         if (operation === "suma") {
             question = `${num1} + ${num2}`;
