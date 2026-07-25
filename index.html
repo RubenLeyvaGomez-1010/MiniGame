@@ -3,108 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Sprint - Juego de Matematicas</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Math Sprint - Inicio</title>
+    <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-    <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
-    <div class="container">
-        <div class="header">
-            <div class="header-top">
-                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar tema">
-                    Modo oscuro
-                </button>
-                <button class="sound-toggle" id="soundToggle" type="button" aria-label="Silenciar sonidos">
-                    Sonido: ON
-                </button>
-            </div>
-            <div class="title">Math Sprint</div>
-            <div class="subtitle">Responde rapido, haz rachas y supera tu mejor marca</div>
-        </div>
+    <main class="page">
+        <nav class="top-nav">
+            <a class="active" href="index.html">Inicio</a>
+            <a href="game.html">Jugar</a>
+            <a href="profile.html">Perfil</a>
+            <a href="leaderboard.html">Ranking</a>
+        </nav>
 
-        <div class="score-board">
-            <div class="score-item">
-                <div class="score-label">Puntuacion</div>
-                <div class="score-value" id="score">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Correctas</div>
-                <div class="score-value correct-color" id="correct">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Incorrectas</div>
-                <div class="score-value incorrect-color" id="incorrect">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Mejor Puntuacion</div>
-                <div class="score-value best-color" id="bestScore">0</div>
-            </div>
-        </div>
+        <h1>Math Sprint</h1>
+        <p class="sub">Ahora tu juego ya tiene varias paginas y backend para guardar progreso real.</p>
 
-        <div class="difficulty-selector">
-            <label class="difficulty-label">Selecciona dificultad:</label>
-            <div class="difficulty-buttons">
-                <button class="difficulty-btn active" data-difficulty="easy">Facil</button>
-                <button class="difficulty-btn" data-difficulty="medium">Medio</button>
-                <button class="difficulty-btn" data-difficulty="hard">Dificil</button>
-            </div>
-        </div>
-
-        <div class="game-meta">
-            <div class="meta-row">
-                <span id="timerLabel">Tiempo: 12s</span>
-                <span id="progressLabel">Pregunta 1 de 20</span>
-            </div>
-            <div class="timer-track">
-                <div class="timer-bar" id="timerBar"></div>
-            </div>
-        </div>
-
-        <div class="game-area">
-            <div class="mascot-panel" id="mascotPanel">
-                <div class="mascot-face" id="mascotFace">:)</div>
-                <div class="mascot-text" id="mascotText">Vamos, tu puedes con esto.</div>
-            </div>
-            <div class="feedback empty-feedback" id="feedback"></div>
-            <div class="question" id="question">5 + 3</div>
-            <div class="input-group">
-                <input
-                    type="number"
-                    id="answer"
-                    placeholder="Tu respuesta"
-                    autocomplete="off"
-                >
-            </div>
-            <div class="buttons-group">
-                <button class="btn-submit" id="submitBtn">Responder</button>
-                <button class="btn-skip" id="skipBtn">Saltar</button>
-                <button class="btn-reset" id="resetBtn">Nuevo juego</button>
-            </div>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-label">Racha</div>
-                    <div class="stat-value" id="streak">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Preguntas</div>
-                    <div class="stat-value" id="attempts">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Multiplicador</div>
-                    <div class="stat-value" id="multiplier">x1</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="medals-panel">
-            <div class="medals-head">
-                <div class="medals-title">Medallas desbloqueables</div>
-                <div class="level-badge" id="playerLevel">Nivel: Rookie</div>
-            </div>
-            <div class="medals-grid" id="medalsGrid"></div>
-        </div>
-    </div>
-
-    <script src="js/game.js" defer></script>
+        <section class="grid">
+            <article class="card">
+                <h3>Jugar</h3>
+                <p>Resuelve operaciones, haz rachas, desbloquea medallas y sube de nivel.</p>
+                <a class="btn primary" href="game.html">Ir al juego</a>
+            </article>
+            <article class="card">
+                <h3>Perfil</h3>
+                <p>Configura tu nombre de jugador y consulta tus estadisticas guardadas.</p>
+                <a class="btn secondary" href="profile.html">Abrir perfil</a>
+            </article>
+            <article class="card">
+                <h3>Ranking</h3>
+                <p>Mira quienes tienen los mejores scores en tu mini juego.</p>
+                <a class="btn secondary" href="leaderboard.html">Ver ranking</a>
+            </article>
+        </section>
+    </main>
 </body>
 </html>

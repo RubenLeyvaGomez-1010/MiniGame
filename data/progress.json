@@ -1,0 +1,18 @@
+{
+  "users": {
+    "Ruben": {
+      "username": "Ruben",
+      "bestScore": 79,
+      "totalCorrect": 4,
+      "totalIncorrect": 0,
+      "highestStreak": 4,
+      "gamesPlayed": 1,
+      "medals": [
+        "first-correct",
+        "speedster"
+      ],
+      "level": "Hero",
+      "lastPlayed": "2026-07-25T20:10:52.391Z"
+    }
+  }
+}

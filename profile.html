@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Sprint - Perfil</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+    <main class="page">
+        <nav class="top-nav">
+            <a href="index.html">Inicio</a>
+            <a href="game.html">Jugar</a>
+            <a class="active" href="profile.html">Perfil</a>
+            <a href="leaderboard.html">Ranking</a>
+        </nav>
+
+        <h1>Tu Perfil</h1>
+        <p class="sub">Elige tu nombre para guardar progreso en el backend.</p>
+
+        <div class="input-row">
+            <input id="usernameInput" type="text" maxlength="24" placeholder="Escribe tu nombre de jugador">
+            <button id="saveUserBtn" class="btn primary" type="button">Guardar usuario</button>
+            <button id="refreshBtn" class="btn secondary" type="button">Recargar stats</button>
+        </div>
+
+        <div id="profileStatus" class="sub"></div>
+
+        <section class="data-card">
+            <div class="data-grid" id="profileGrid">
+                <div class="data-item">
+                    <div class="data-label">Mejor puntuacion</div>
+                    <div class="data-value" id="pBest">0</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Correctas totales</div>
+                    <div class="data-value" id="pCorrect">0</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Incorrectas totales</div>
+                    <div class="data-value" id="pIncorrect">0</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Racha maxima</div>
+                    <div class="data-value" id="pStreak">0</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Medallas</div>
+                    <div class="data-value" id="pMedals">0</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Nivel</div>
+                    <div class="data-value" id="pLevel">Rookie</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

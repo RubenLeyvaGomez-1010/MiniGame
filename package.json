@@ -1,0 +1,25 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RubenLeyvaGomez-1010/MiniGame.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RubenLeyvaGomez-1010/MiniGame/issues"
+  },
+  "homepage": "https://github.com/RubenLeyvaGomez-1010/MiniGame#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

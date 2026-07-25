@@ -1,3 +1,5 @@
+const USER_KEY = "mathSprintUser";
+
 class MathGame {
     constructor() {
         this.score = 0;
@@ -27,6 +29,8 @@ class MathGame {
             { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%", icon: "MAX" }
         ];
         this.unlockedMedals = new Set(this.getStoredMedals());
+        this.username = this.getStoredUsername();
+        this.gamesPlayed = 0;
 
         this.theme = this.getStoredTheme();
 
@@ -35,7 +39,9 @@ class MathGame {
         this.renderMedals();
         this.updatePlayerLevel();
         this.updateBestScoreUI();
+        this.updateCurrentUserUI();
         this.updateMascot(":)", "Vamos, tu puedes con esto.", "");
+        this.loadServerProgress();
         this.generateQuestion();
     }
 
@@ -77,6 +83,80 @@ class MathGame {
 
     saveBestScore() {
         localStorage.setItem("mathGameBestScore", String(this.bestScore));
+    }
+
+    getStoredUsername() {
+        const stored = localStorage.getItem(USER_KEY);
+        if (stored && stored.trim()) {
+            return stored.trim().slice(0, 24);
+        }
+
+        const guest = `Invitado-${Math.floor(Math.random() * 9000) + 1000}`;
+        localStorage.setItem(USER_KEY, guest);
+        return guest;
+    }
+
+    updateCurrentUserUI() {
+        const chip = document.getElementById("currentUser");
+        if (!chip) {
+            return;
+        }
+
+        chip.textContent = `Jugador: ${this.username}`;
+    }
+
+    async loadServerProgress() {
+        try {
+            const response = await fetch(`/api/progress/${encodeURIComponent(this.username)}`);
+            if (!response.ok) {
+                return;
+            }
+
+            const profile = await response.json();
+            this.bestScore = Math.max(this.bestScore, Number(profile.bestScore) || 0);
+            this.gamesPlayed = Number(profile.gamesPlayed) || 0;
+
+            if (Array.isArray(profile.medals)) {
+                this.unlockedMedals = new Set(profile.medals);
+            }
+
+            this.renderMedals();
+            this.updatePlayerLevel();
+            this.updateBestScoreUI();
+        } catch (_error) {
+            // Si no hay servidor corriendo, el juego sigue funcionando localmente.
+        }
+    }
+
+    async saveProgressToServer() {
+        const level = this.getCurrentLevelName();
+
+        const payload = {
+            username: this.username,
+            score: this.score,
+            bestScore: this.bestScore,
+            correct: this.correct,
+            incorrect: this.incorrect,
+            streak: this.streak,
+            highestStreak: this.streak,
+            totalCorrect: this.correct,
+            totalIncorrect: this.incorrect,
+            gamesPlayed: Math.max(1, this.gamesPlayed),
+            medals: Array.from(this.unlockedMedals),
+            level
+        };
+
+        try {
+            await fetch("/api/progress", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+        } catch (_error) {
+            // Si falla la red, evitamos romper el flujo del juego.
+        }
     }
 
     getStoredSoundEnabled() {
@@ -138,25 +218,32 @@ class MathGame {
         });
     }
 
+    getCurrentLevelName() {
+        const total = this.medalDefinitions.length;
+        const unlocked = this.unlockedMedals.size;
+
+        if (unlocked >= total) {
+            return "Legend";
+        }
+        if (unlocked >= 3) {
+            return "Pro";
+        }
+        if (unlocked >= 2) {
+            return "Hero";
+        }
+        if (unlocked >= 1) {
+            return "Explorer";
+        }
+        return "Rookie";
+    }
+
     updatePlayerLevel() {
         const levelEl = document.getElementById("playerLevel");
         if (!levelEl) {
             return;
         }
 
-        const total = this.medalDefinitions.length;
-        const unlocked = this.unlockedMedals.size;
-
-        let level = "Rookie";
-        if (unlocked >= total) {
-            level = "Legend";
-        } else if (unlocked >= 3) {
-            level = "Pro";
-        } else if (unlocked >= 2) {
-            level = "Hero";
-        } else if (unlocked >= 1) {
-            level = "Explorer";
-        }
+        const level = this.getCurrentLevelName();
 
         levelEl.textContent = `Nivel: ${level}`;
     }
@@ -197,6 +284,7 @@ class MathGame {
         this.updateMascot("B)", "Nueva medalla desbloqueada!", "cheer");
         this.playMedalSound();
         this.launchConfetti();
+        this.saveProgressToServer();
     }
 
     updateMascot(face, text, moodClass) {
@@ -464,6 +552,7 @@ class MathGame {
         this.isQuestionActive = false;
         this.updateBestScoreIfNeeded();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -485,6 +574,7 @@ class MathGame {
         this.updateMascot(":/", "Saltar tambien es estrategia.", "warn");
         this.playIncorrectSound();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -550,6 +640,7 @@ class MathGame {
         this.updateMascot(":O", "Ups, se acabo el tiempo.", "warn");
         this.playIncorrectSound();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -612,6 +703,9 @@ class MathGame {
             this.updateMascot(":)", "Buena ronda. Vamos por mas.", "");
         }
 
+        this.gamesPlayed += 1;
+        this.saveProgressToServer();
+
         setTimeout(() => {
             const keepPlaying = confirm(
                 "Ronda terminada.\n\nQuieres jugar otra ronda manteniendo tu mejor puntuacion?"
@@ -647,6 +741,7 @@ class MathGame {
         this.attempts = 0;
         this.updateStats();
         this.updateMascot(":)", "Nuevo juego, nueva oportunidad.", "");
+        this.saveProgressToServer();
         this.generateQuestion();
     }
 }

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Sprint - Ranking</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+    <main class="page">
+        <nav class="top-nav">
+            <a href="index.html">Inicio</a>
+            <a href="game.html">Jugar</a>
+            <a href="profile.html">Perfil</a>
+            <a class="active" href="leaderboard.html">Ranking</a>
+        </nav>
+
+        <h1>Ranking Global</h1>
+        <p class="sub">Top jugadores por mejor puntuacion.</p>
+
+        <button id="reloadRankingBtn" class="btn secondary" type="button">Actualizar ranking</button>
+
+        <section class="data-card" style="margin-top: 16px;">
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Jugador</th>
+                        <th>Mejor score</th>
+                        <th>Nivel</th>
+                        <th>Medallas</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="js/leaderboard.js" defer></script>
+</body>
+</html>
