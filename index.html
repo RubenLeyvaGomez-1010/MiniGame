@@ -3,321 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Game - Juego de Matemáticas</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .title {
-            font-size: 2.5em;
-            color: #667eea;
-            margin-bottom: 10px;
-            animation: bounce 0.6s ease-in-out;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .score-board {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            border-radius: 15px;
-            color: white;
-        }
-
-        .score-item {
-            text-align: center;
-        }
-
-        .score-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .score-value {
-            font-size: 1.8em;
-            font-weight: bold;
-        }
-
-        .difficulty-selector {
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .difficulty-label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #333;
-            font-size: 1.1em;
-        }
-
-        .difficulty-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .difficulty-btn {
-            padding: 10px 20px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 1em;
-        }
-
-        .difficulty-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .difficulty-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .game-area {
-            background: #f8f9ff;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-
-        .question {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-            animation: fadeIn 0.4s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 15px;
-            font-size: 1.3em;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .buttons-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 15px;
-            font-size: 1.1em;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-reset {
-            background: #ff6b6b;
-            color: white;
-            padding: 10px 20px;
-            flex: 0;
-        }
-
-        .btn-reset:hover {
-            background: #ee5a5a;
-            transform: scale(1.05);
-        }
-
-        .feedback {
-            text-align: center;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feedback.correct {
-            animation: correctAnswer 0.6s ease-in-out;
-        }
-
-        .feedback.incorrect {
-            animation: incorrectAnswer 0.6s ease-in-out;
-        }
-
-        @keyframes correctAnswer {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        @keyframes incorrectAnswer {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid #e0e0e0;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            color: #999;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .correct-color {
-            color: #4caf50;
-        }
-
-        .incorrect-color {
-            color: #ff6b6b;
-        }
-
-        .empty-feedback {
-            color: transparent;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-
-            .title {
-                font-size: 2em;
-            }
-
-            .question {
-                font-size: 2em;
-            }
-
-            .difficulty-buttons {
-                flex-direction: column;
-            }
-
-            .difficulty-btn {
-                width: 100%;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            .buttons-group {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <title>Math Sprint - Juego de Matematicas</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="title">🎮 Math Game 🎮</div>
+            <div class="header-top">
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar tema">
+                    Modo oscuro
+                </button>
+            </div>
+            <div class="title">Math Sprint</div>
+            <div class="subtitle">Responde rapido, haz rachas y supera tu mejor marca</div>
         </div>
 
         <div class="score-board">
             <div class="score-item">
-                <div class="score-label">Puntuación</div>
+                <div class="score-label">Puntuacion</div>
                 <div class="score-value" id="score">0</div>
             </div>
             <div class="score-item">
@@ -328,14 +31,28 @@
                 <div class="score-label">Incorrectas</div>
                 <div class="score-value incorrect-color" id="incorrect">0</div>
             </div>
+            <div class="score-item">
+                <div class="score-label">Mejor Puntuacion</div>
+                <div class="score-value best-color" id="bestScore">0</div>
+            </div>
         </div>
 
         <div class="difficulty-selector">
             <label class="difficulty-label">Selecciona dificultad:</label>
             <div class="difficulty-buttons">
-                <button class="difficulty-btn active" data-difficulty="easy">🟢 Fácil</button>
-                <button class="difficulty-btn" data-difficulty="medium">🟡 Medio</button>
-                <button class="difficulty-btn" data-difficulty="hard">🔴 Difícil</button>
+                <button class="difficulty-btn active" data-difficulty="easy">Facil</button>
+                <button class="difficulty-btn" data-difficulty="medium">Medio</button>
+                <button class="difficulty-btn" data-difficulty="hard">Dificil</button>
+            </div>
+        </div>
+
+        <div class="game-meta">
+            <div class="meta-row">
+                <span id="timerLabel">Tiempo: 12s</span>
+                <span id="progressLabel">Pregunta 1 de 20</span>
+            </div>
+            <div class="timer-track">
+                <div class="timer-bar" id="timerBar"></div>
             </div>
         </div>
 
@@ -343,158 +60,35 @@
             <div class="feedback empty-feedback" id="feedback"></div>
             <div class="question" id="question">5 + 3</div>
             <div class="input-group">
-                <input 
-                    type="number" 
-                    id="answer" 
-                    placeholder="Tu respuesta" 
+                <input
+                    type="number"
+                    id="answer"
+                    placeholder="Tu respuesta"
                     autocomplete="off"
                 >
             </div>
             <div class="buttons-group">
-                <button class="btn-submit" id="submitBtn">✓ Responder</button>
-                <button class="btn-reset" id="resetBtn">↻ Nuevo Juego</button>
+                <button class="btn-submit" id="submitBtn">Responder</button>
+                <button class="btn-skip" id="skipBtn">Saltar</button>
+                <button class="btn-reset" id="resetBtn">Nuevo juego</button>
             </div>
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-label">Racha Correcta</div>
+                    <div class="stat-label">Racha</div>
                     <div class="stat-value" id="streak">0</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">Preguntas</div>
                     <div class="stat-value" id="attempts">0</div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-label">Multiplicador</div>
+                    <div class="stat-value" id="multiplier">x1</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        class MathGame {
-            constructor() {
-                this.score = 0;
-                this.correct = 0;
-                this.incorrect = 0;
-                this.streak = 0;
-                this.attempts = 0;
-                this.difficulty = 'easy';
-                this.currentQuestion = null;
-                this.correctAnswer = null;
-
-                this.initEventListeners();
-                this.generateQuestion();
-            }
-
-            initEventListeners() {
-                document.getElementById('submitBtn').addEventListener('click', () => this.submitAnswer());
-                document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
-                document.getElementById('answer').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.submitAnswer();
-                });
-
-                document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
-                        this.difficulty = e.target.dataset.difficulty;
-                        this.generateQuestion();
-                    });
-                });
-            }
-
-            generateQuestion() {
-                const operations = ['suma', 'resta', 'multiplicacion'];
-                const operation = operations[Math.floor(Math.random() * operations.length)];
-                
-                let num1, num2, answer, question;
-
-                if (this.difficulty === 'easy') {
-                    num1 = Math.floor(Math.random() * 10);
-                    num2 = Math.floor(Math.random() * 10);
-                } else if (this.difficulty === 'medium') {
-                    num1 = Math.floor(Math.random() * 20);
-                    num2 = Math.floor(Math.random() * 20);
-                } else {
-                    num1 = Math.floor(Math.random() * 20);
-                    num2 = Math.floor(Math.random() * 12);
-                }
-
-                if (operation === 'suma') {
-                    question = `${num1} + ${num2}`;
-                    answer = num1 + num2;
-                } else if (operation === 'resta') {
-                    // Asegurar que el resultado no sea negativo
-                    if (num1 < num2) [num1, num2] = [num2, num1];
-                    question = `${num1} - ${num2}`;
-                    answer = num1 - num2;
-                } else {
-                    question = `${num1} × ${num2}`;
-                    answer = num1 * num2;
-                }
-
-                this.currentQuestion = question;
-                this.correctAnswer = answer;
-                document.getElementById('question').textContent = question;
-                document.getElementById('answer').value = '';
-                document.getElementById('answer').focus();
-                document.getElementById('feedback').textContent = '';
-                document.getElementById('feedback').className = 'feedback empty-feedback';
-            }
-
-            submitAnswer() {
-                const userAnswer = parseInt(document.getElementById('answer').value);
-
-                if (isNaN(userAnswer)) {
-                    this.showFeedback('Por favor, ingresa un número', 'incorrect');
-                    return;
-                }
-
-                this.attempts++;
-
-                if (userAnswer === this.correctAnswer) {
-                    this.correct++;
-                    this.streak++;
-                    this.score += 10;
-                    this.showFeedback('¡Correcto! ✅ 🎉', 'correct');
-                } else {
-                    this.incorrect++;
-                    this.streak = 0;
-                    this.showFeedback(`Incorrecto ❌ La respuesta era ${this.correctAnswer}`, 'incorrect');
-                }
-
-                this.updateStats();
-                setTimeout(() => this.generateQuestion(), 1500);
-            }
-
-            showFeedback(message, type) {
-                const feedback = document.getElementById('feedback');
-                feedback.textContent = message;
-                feedback.className = `feedback ${type}`;
-            }
-
-            updateStats() {
-                document.getElementById('score').textContent = this.score;
-                document.getElementById('correct').textContent = this.correct;
-                document.getElementById('incorrect').textContent = this.incorrect;
-                document.getElementById('streak').textContent = this.streak;
-                document.getElementById('attempts').textContent = this.attempts;
-            }
-
-            resetGame() {
-                if (confirm('¿Estás seguro que quieres reiniciar el juego?')) {
-                    this.score = 0;
-                    this.correct = 0;
-                    this.incorrect = 0;
-                    this.streak = 0;
-                    this.attempts = 0;
-                    this.updateStats();
-                    this.generateQuestion();
-                }
-            }
-        }
-
-        // Iniciar el juego cuando carga la página
-        document.addEventListener('DOMContentLoaded', () => {
-            new MathGame();
-        });
-    </script>
+    <script src="js/game.js" defer></script>
 </body>
 </html>
