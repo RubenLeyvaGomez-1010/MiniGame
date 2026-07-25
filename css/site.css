@@ -14,6 +14,16 @@
     --brand-2: #0ea5a0;
 }
 
+body.dark-theme {
+    --bg-a: #0f1220;
+    --bg-b: #152438;
+    --card: #111829;
+    --ink: #ecf4ff;
+    --muted: #9fb3ca;
+    --brand: #ffb347;
+    --brand-2: #5eead4;
+}
+
 body {
     font-family: "Trebuchet MS", "Verdana", sans-serif;
     color: var(--ink);
@@ -39,6 +49,7 @@ body {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    align-items: center;
     margin-bottom: 18px;
 }
 
@@ -57,6 +68,22 @@ body {
     background: linear-gradient(135deg, var(--brand), #ffb347);
     color: #fff;
     border: none;
+}
+
+.theme-toggle-site {
+    margin-left: auto;
+    border: 1px solid rgba(15, 23, 42, 0.2);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #0f172a;
+    background: #fff;
+}
+
+.theme-toggle-site:hover {
+    transform: translateY(-1px);
 }
 
 h1 {
@@ -162,9 +189,52 @@ h1 {
     border-bottom: 1px solid rgba(30, 41, 59, 0.14);
 }
 
+body.dark-theme .page {
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-theme .top-nav a {
+    color: var(--ink);
+    background: rgba(14, 26, 44, 0.85);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .theme-toggle-site {
+    color: var(--ink);
+    background: rgba(14, 26, 44, 0.85);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .card,
+body.dark-theme .data-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+body.dark-theme .data-item {
+    background: rgba(91, 137, 189, 0.2);
+}
+
+body.dark-theme .rank-table th,
+body.dark-theme .rank-table td {
+    border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+body.dark-theme .input-row input {
+    background: #0c1526;
+    border-color: #38516f;
+    color: var(--ink);
+}
+
 @media (max-width: 720px) {
     .grid {
         grid-template-columns: 1fr;
+    }
+
+    .theme-toggle-site {
+        margin-left: 0;
+        width: 100%;
     }
 
     .data-grid {
