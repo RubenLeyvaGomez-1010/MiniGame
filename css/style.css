@@ -47,6 +47,35 @@ body.dark-theme {
     --shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
+.confetti-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 30;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -16px;
+    width: 10px;
+    height: 16px;
+    opacity: 0.9;
+    animation: confettiFall 1.35s linear forwards;
+}
+
+@keyframes confettiFall {
+    from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.95;
+    }
+
+    to {
+        transform: translateY(110vh) rotate(640deg);
+        opacity: 0;
+    }
+}
+
 .container {
     background: var(--card);
     border-radius: 24px;
@@ -77,9 +106,48 @@ body.dark-theme {
 
 .header-top {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
     margin-bottom: 10px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.header-nav a {
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.85);
+    color: #1f2937;
+    border: 1px solid rgba(31, 42, 55, 0.25);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.user-chip {
+    border-radius: 999px;
+    border: 1px solid rgba(31, 42, 55, 0.2);
+    background: rgba(255, 255, 255, 0.88);
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .theme-toggle {
@@ -167,6 +235,46 @@ body.dark-theme {
 .difficulty-selector {
     margin-bottom: 18px;
     text-align: center;
+}
+
+.age-selector {
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.age-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.age-btn {
+    padding: 10px 18px;
+    border: 2px solid #2b6cb0;
+    background: white;
+    color: #2b6cb0;
+    border-radius: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.25s;
+    font-size: 0.96em;
+}
+
+.age-btn:hover {
+    transform: translateY(-2px);
+}
+
+.age-btn.active {
+    background: #2b6cb0;
+    color: white;
+}
+
+.age-note {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 700;
 }
 
 .difficulty-label {
@@ -491,6 +599,30 @@ button {
     font-weight: 700;
 }
 
+.medals-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.medals-head .medals-title {
+    margin-bottom: 0;
+}
+
+.level-badge {
+    border-radius: 999px;
+    padding: 6px 11px;
+    border: 1px solid rgba(43, 58, 74, 0.24);
+    background: rgba(255, 255, 255, 0.88);
+    color: #2b3a4a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .medals-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -498,6 +630,9 @@ button {
 }
 
 .medal-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     border-radius: 12px;
     padding: 10px;
     border: 1px solid rgba(43, 58, 74, 0.15);
@@ -506,6 +641,25 @@ button {
     font-weight: 700;
     color: #2b3a4a;
     transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.medal-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+    border: 2px solid rgba(43, 58, 74, 0.25);
+    background: #f2f4f7;
+    color: #4f6073;
+}
+
+.medal-copy {
+    line-height: 1.2;
 }
 
 .medal-badge span {
@@ -520,6 +674,12 @@ button {
     border-color: rgba(255, 179, 71, 0.8);
     background: linear-gradient(135deg, rgba(255, 179, 71, 0.34) 0%, rgba(94, 234, 212, 0.26) 100%);
     transform: translateY(-1px);
+}
+
+.medal-badge.unlocked .medal-icon {
+    border-color: rgba(255, 159, 28, 0.75);
+    background: linear-gradient(135deg, #ffd166 0%, #ff9f1c 100%);
+    color: #4a2b02;
 }
 
 .medal-badge.locked {
@@ -540,6 +700,7 @@ button {
     }
 
     .difficulty-buttons,
+    .age-buttons,
     .buttons-group,
     .input-group {
         flex-direction: column;
@@ -555,6 +716,10 @@ button {
         flex-wrap: wrap;
     }
 
+    .header-controls {
+        justify-content: center;
+    }
+
     .question {
         font-size: 1.95em;
     }
@@ -566,6 +731,11 @@ button {
     .medals-grid {
         grid-template-columns: 1fr;
     }
+
+    .medals-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 body.dark-theme .score-item {
@@ -575,6 +745,17 @@ body.dark-theme .score-item {
 
 body.dark-theme .difficulty-btn {
     background: rgba(17, 24, 41, 0.7);
+}
+
+body.dark-theme .age-btn {
+    background: rgba(17, 24, 41, 0.7);
+    border-color: #5b89bd;
+    color: #9bc6f7;
+}
+
+body.dark-theme .age-btn.active {
+    background: #5b89bd;
+    color: #0f1a2c;
 }
 
 body.dark-theme .game-area {
@@ -624,12 +805,31 @@ body.dark-theme .medals-panel {
     background: linear-gradient(135deg, rgba(15, 28, 45, 0.84) 0%, rgba(10, 24, 37, 0.9) 100%);
 }
 
+body.dark-theme .level-badge {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: #d9ebff;
+}
+
 body.dark-theme .medal-badge {
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.05);
     color: #e5f0ff;
 }
 
+body.dark-theme .medal-icon {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+    color: #d2e4f9;
+}
+
 body.dark-theme .medal-badge.unlocked {
     background: linear-gradient(135deg, rgba(255, 179, 71, 0.32) 0%, rgba(94, 234, 212, 0.23) 100%);
+}
+
+body.dark-theme .header-nav a,
+body.dark-theme .user-chip {
+    background: rgba(14, 26, 44, 0.85);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--ink);
 }

@@ -1,3 +1,6 @@
+const USER_KEY = "mathSprintUser";
+const AGE_KEY = "mathSprintAgeGroup";
+
 class MathGame {
     constructor() {
         this.score = 0;
@@ -7,6 +10,7 @@ class MathGame {
         this.attempts = 0;
 
         this.difficulty = "easy";
+        this.ageGroup = this.getStoredAgeGroup();
         this.currentQuestion = "";
         this.correctAnswer = null;
 
@@ -21,20 +25,25 @@ class MathGame {
         this.audioContext = null;
 
         this.medalDefinitions = [
-            { id: "first-correct", title: "Primer acierto", hint: "Responde bien 1 vez" },
-            { id: "streak-5", title: "Racha 5", hint: "Consigue 5 aciertos seguidos" },
-            { id: "speedster", title: "Velocista", hint: "Responde con mas del 70% del tiempo" },
-            { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%" }
+            { id: "first-correct", title: "Primer acierto", hint: "Responde bien 1 vez", icon: "M1" },
+            { id: "streak-5", title: "Racha 5", hint: "Consigue 5 aciertos seguidos", icon: "R5" },
+            { id: "speedster", title: "Velocista", hint: "Responde con mas del 70% del tiempo", icon: "SPD" },
+            { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%", icon: "MAX" }
         ];
         this.unlockedMedals = new Set(this.getStoredMedals());
+        this.username = this.getStoredUsername();
+        this.gamesPlayed = 0;
 
         this.theme = this.getStoredTheme();
 
         this.applyTheme();
         this.initEventListeners();
         this.renderMedals();
+        this.updatePlayerLevel();
         this.updateBestScoreUI();
+        this.updateCurrentUserUI();
         this.updateMascot(":)", "Vamos, tu puedes con esto.", "");
+        this.loadServerProgress();
         this.generateQuestion();
     }
 
@@ -64,6 +73,24 @@ class MathGame {
             });
         });
 
+        document.querySelectorAll(".age-btn").forEach((button) => {
+            button.addEventListener("click", (event) => {
+                document.querySelectorAll(".age-btn").forEach((btn) => {
+                    btn.classList.remove("active");
+                });
+
+                event.target.classList.add("active");
+                this.ageGroup = event.target.dataset.ageGroup;
+                this.saveAgeGroup();
+                this.updateAgeNote();
+                this.syncDifficultySettings();
+                this.generateQuestion();
+            });
+        });
+
+        this.activateAgeGroupButton();
+        this.updateAgeNote();
+
         this.updateThemeButtonText();
         this.updateSoundButtonText();
     }
@@ -74,8 +101,119 @@ class MathGame {
         return Number.isFinite(parsed) ? parsed : 0;
     }
 
+    getStoredAgeGroup() {
+        const stored = localStorage.getItem(AGE_KEY);
+        if (stored === "6-8" || stored === "9-10" || stored === "11-12") {
+            return stored;
+        }
+        return "6-8";
+    }
+
+    saveAgeGroup() {
+        localStorage.setItem(AGE_KEY, this.ageGroup);
+    }
+
+    activateAgeGroupButton() {
+        document.querySelectorAll(".age-btn").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.ageGroup === this.ageGroup);
+        });
+    }
+
+    updateAgeNote() {
+        const ageNote = document.getElementById("ageNote");
+        if (!ageNote) {
+            return;
+        }
+
+        if (this.ageGroup === "6-8") {
+            ageNote.textContent = "Modo 6-8: numeros pequenos y mas tiempo.";
+            return;
+        }
+
+        if (this.ageGroup === "9-10") {
+            ageNote.textContent = "Modo 9-10: equilibrio entre rapidez y reto.";
+            return;
+        }
+
+        ageNote.textContent = "Modo 11-12: mas desafio y menos tiempo.";
+    }
+
     saveBestScore() {
         localStorage.setItem("mathGameBestScore", String(this.bestScore));
+    }
+
+    getStoredUsername() {
+        const stored = localStorage.getItem(USER_KEY);
+        if (stored && stored.trim()) {
+            return stored.trim().slice(0, 24);
+        }
+
+        const guest = `Invitado-${Math.floor(Math.random() * 9000) + 1000}`;
+        localStorage.setItem(USER_KEY, guest);
+        return guest;
+    }
+
+    updateCurrentUserUI() {
+        const chip = document.getElementById("currentUser");
+        if (!chip) {
+            return;
+        }
+
+        chip.textContent = `Jugador: ${this.username}`;
+    }
+
+    async loadServerProgress() {
+        try {
+            const response = await fetch(`/api/progress/${encodeURIComponent(this.username)}`);
+            if (!response.ok) {
+                return;
+            }
+
+            const profile = await response.json();
+            this.bestScore = Math.max(this.bestScore, Number(profile.bestScore) || 0);
+            this.gamesPlayed = Number(profile.gamesPlayed) || 0;
+
+            if (Array.isArray(profile.medals)) {
+                this.unlockedMedals = new Set(profile.medals);
+            }
+
+            this.renderMedals();
+            this.updatePlayerLevel();
+            this.updateBestScoreUI();
+        } catch (_error) {
+            // Si no hay servidor corriendo, el juego sigue funcionando localmente.
+        }
+    }
+
+    async saveProgressToServer() {
+        const level = this.getCurrentLevelName();
+
+        const payload = {
+            username: this.username,
+            score: this.score,
+            bestScore: this.bestScore,
+            correct: this.correct,
+            incorrect: this.incorrect,
+            streak: this.streak,
+            highestStreak: this.streak,
+            totalCorrect: this.correct,
+            totalIncorrect: this.incorrect,
+            gamesPlayed: Math.max(1, this.gamesPlayed),
+            medals: Array.from(this.unlockedMedals),
+            level
+        };
+
+        try {
+            await fetch("/api/progress", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+        } catch (_error) {
+            // Si falla la red, evitamos romper el flujo del juego.
+        }
     }
 
     getStoredSoundEnabled() {
@@ -126,9 +264,69 @@ class MathGame {
             const isUnlocked = this.unlockedMedals.has(medal.id);
             const item = document.createElement("div");
             item.className = `medal-badge ${isUnlocked ? "unlocked" : "locked"}`;
-            item.innerHTML = `${isUnlocked ? "[UNLOCKED]" : "[LOCKED]"} ${medal.title}<span>${medal.hint}</span>`;
+            item.innerHTML = `
+                <div class="medal-icon">${medal.icon}</div>
+                <div class="medal-copy">
+                    ${medal.title}
+                    <span>${medal.hint}</span>
+                </div>
+            `;
             grid.appendChild(item);
         });
+    }
+
+    getCurrentLevelName() {
+        const total = this.medalDefinitions.length;
+        const unlocked = this.unlockedMedals.size;
+
+        if (unlocked >= total) {
+            return "Legend";
+        }
+        if (unlocked >= 3) {
+            return "Pro";
+        }
+        if (unlocked >= 2) {
+            return "Hero";
+        }
+        if (unlocked >= 1) {
+            return "Explorer";
+        }
+        return "Rookie";
+    }
+
+    updatePlayerLevel() {
+        const levelEl = document.getElementById("playerLevel");
+        if (!levelEl) {
+            return;
+        }
+
+        const level = this.getCurrentLevelName();
+
+        levelEl.textContent = `Nivel: ${level}`;
+    }
+
+    launchConfetti() {
+        const layer = document.getElementById("confettiLayer");
+        if (!layer) {
+            return;
+        }
+
+        const colors = ["#ff7a18", "#ffb347", "#5eead4", "#2b6cb0", "#f87171"];
+        const pieces = 34;
+
+        for (let index = 0; index < pieces; index += 1) {
+            const piece = document.createElement("span");
+            piece.className = "confetti-piece";
+            piece.style.left = `${Math.random() * 100}%`;
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDelay = `${Math.random() * 0.35}s`;
+            piece.style.transform = `rotate(${Math.floor(Math.random() * 320)}deg)`;
+            layer.appendChild(piece);
+
+            setTimeout(() => {
+                piece.remove();
+            }, 1600);
+        }
     }
 
     unlockMedal(medalId) {
@@ -139,8 +337,11 @@ class MathGame {
         this.unlockedMedals.add(medalId);
         this.saveMedals();
         this.renderMedals();
+        this.updatePlayerLevel();
         this.updateMascot("B)", "Nueva medalla desbloqueada!", "cheer");
         this.playMedalSound();
+        this.launchConfetti();
+        this.saveProgressToServer();
     }
 
     updateMascot(face, text, moodClass) {
@@ -278,13 +479,19 @@ class MathGame {
     }
 
     syncDifficultySettings() {
-        if (this.difficulty === "easy") {
-            this.timePerQuestion = 12;
-        } else if (this.difficulty === "medium") {
-            this.timePerQuestion = 10;
-        } else {
-            this.timePerQuestion = 8;
-        }
+        const baseTimes = {
+            easy: 12,
+            medium: 10,
+            hard: 8
+        };
+
+        const ageDelta = this.ageGroup === "6-8"
+            ? 2
+            : this.ageGroup === "9-10"
+                ? 0
+                : -1;
+
+        this.timePerQuestion = Math.max(6, baseTimes[this.difficulty] + ageDelta);
     }
 
     generateQuestion() {
@@ -307,16 +514,27 @@ class MathGame {
         let answer;
         let question;
 
-        if (this.difficulty === "easy") {
-            num1 = Math.floor(Math.random() * 10) + 1;
-            num2 = Math.floor(Math.random() * 10) + 1;
-        } else if (this.difficulty === "medium") {
-            num1 = Math.floor(Math.random() * 20) + 2;
-            num2 = Math.floor(Math.random() * 20) + 2;
-        } else {
-            num1 = Math.floor(Math.random() * 30) + 2;
-            num2 = Math.floor(Math.random() * 12) + 2;
-        }
+        const numberRanges = {
+            "6-8": {
+                easy: { max1: 10, max2: 10, min1: 1, min2: 1 },
+                medium: { max1: 14, max2: 14, min1: 2, min2: 2 },
+                hard: { max1: 20, max2: 10, min1: 2, min2: 2 }
+            },
+            "9-10": {
+                easy: { max1: 12, max2: 12, min1: 1, min2: 1 },
+                medium: { max1: 20, max2: 20, min1: 2, min2: 2 },
+                hard: { max1: 30, max2: 12, min1: 2, min2: 2 }
+            },
+            "11-12": {
+                easy: { max1: 15, max2: 15, min1: 1, min2: 1 },
+                medium: { max1: 25, max2: 25, min1: 2, min2: 2 },
+                hard: { max1: 40, max2: 15, min1: 3, min2: 2 }
+            }
+        };
+
+        const selectedRange = numberRanges[this.ageGroup][this.difficulty];
+        num1 = Math.floor(Math.random() * selectedRange.max1) + selectedRange.min1;
+        num2 = Math.floor(Math.random() * selectedRange.max2) + selectedRange.min2;
 
         if (operation === "suma") {
             question = `${num1} + ${num2}`;
@@ -408,6 +626,7 @@ class MathGame {
         this.isQuestionActive = false;
         this.updateBestScoreIfNeeded();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -429,6 +648,7 @@ class MathGame {
         this.updateMascot(":/", "Saltar tambien es estrategia.", "warn");
         this.playIncorrectSound();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -494,6 +714,7 @@ class MathGame {
         this.updateMascot(":O", "Ups, se acabo el tiempo.", "warn");
         this.playIncorrectSound();
         this.updateStats();
+        this.saveProgressToServer();
 
         setTimeout(() => {
             this.generateQuestion();
@@ -556,6 +777,9 @@ class MathGame {
             this.updateMascot(":)", "Buena ronda. Vamos por mas.", "");
         }
 
+        this.gamesPlayed += 1;
+        this.saveProgressToServer();
+
         setTimeout(() => {
             const keepPlaying = confirm(
                 "Ronda terminada.\n\nQuieres jugar otra ronda manteniendo tu mejor puntuacion?"
@@ -591,6 +815,7 @@ class MathGame {
         this.attempts = 0;
         this.updateStats();
         this.updateMascot(":)", "Nuevo juego, nueva oportunidad.", "");
+        this.saveProgressToServer();
         this.generateQuestion();
     }
 }
