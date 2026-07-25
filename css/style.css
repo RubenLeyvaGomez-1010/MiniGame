@@ -47,6 +47,35 @@ body.dark-theme {
     --shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
+.confetti-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 30;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -16px;
+    width: 10px;
+    height: 16px;
+    opacity: 0.9;
+    animation: confettiFall 1.35s linear forwards;
+}
+
+@keyframes confettiFall {
+    from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.95;
+    }
+
+    to {
+        transform: translateY(110vh) rotate(640deg);
+        opacity: 0;
+    }
+}
+
 .container {
     background: var(--card);
     border-radius: 24px;
@@ -491,6 +520,30 @@ button {
     font-weight: 700;
 }
 
+.medals-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.medals-head .medals-title {
+    margin-bottom: 0;
+}
+
+.level-badge {
+    border-radius: 999px;
+    padding: 6px 11px;
+    border: 1px solid rgba(43, 58, 74, 0.24);
+    background: rgba(255, 255, 255, 0.88);
+    color: #2b3a4a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .medals-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -498,6 +551,9 @@ button {
 }
 
 .medal-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     border-radius: 12px;
     padding: 10px;
     border: 1px solid rgba(43, 58, 74, 0.15);
@@ -506,6 +562,25 @@ button {
     font-weight: 700;
     color: #2b3a4a;
     transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.medal-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+    border: 2px solid rgba(43, 58, 74, 0.25);
+    background: #f2f4f7;
+    color: #4f6073;
+}
+
+.medal-copy {
+    line-height: 1.2;
 }
 
 .medal-badge span {
@@ -520,6 +595,12 @@ button {
     border-color: rgba(255, 179, 71, 0.8);
     background: linear-gradient(135deg, rgba(255, 179, 71, 0.34) 0%, rgba(94, 234, 212, 0.26) 100%);
     transform: translateY(-1px);
+}
+
+.medal-badge.unlocked .medal-icon {
+    border-color: rgba(255, 159, 28, 0.75);
+    background: linear-gradient(135deg, #ffd166 0%, #ff9f1c 100%);
+    color: #4a2b02;
 }
 
 .medal-badge.locked {
@@ -565,6 +646,11 @@ button {
 
     .medals-grid {
         grid-template-columns: 1fr;
+    }
+
+    .medals-head {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
@@ -624,10 +710,22 @@ body.dark-theme .medals-panel {
     background: linear-gradient(135deg, rgba(15, 28, 45, 0.84) 0%, rgba(10, 24, 37, 0.9) 100%);
 }
 
+body.dark-theme .level-badge {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: #d9ebff;
+}
+
 body.dark-theme .medal-badge {
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.05);
     color: #e5f0ff;
+}
+
+body.dark-theme .medal-icon {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+    color: #d2e4f9;
 }
 
 body.dark-theme .medal-badge.unlocked {

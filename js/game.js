@@ -21,10 +21,10 @@ class MathGame {
         this.audioContext = null;
 
         this.medalDefinitions = [
-            { id: "first-correct", title: "Primer acierto", hint: "Responde bien 1 vez" },
-            { id: "streak-5", title: "Racha 5", hint: "Consigue 5 aciertos seguidos" },
-            { id: "speedster", title: "Velocista", hint: "Responde con mas del 70% del tiempo" },
-            { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%" }
+            { id: "first-correct", title: "Primer acierto", hint: "Responde bien 1 vez", icon: "M1" },
+            { id: "streak-5", title: "Racha 5", hint: "Consigue 5 aciertos seguidos", icon: "R5" },
+            { id: "speedster", title: "Velocista", hint: "Responde con mas del 70% del tiempo", icon: "SPD" },
+            { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%", icon: "MAX" }
         ];
         this.unlockedMedals = new Set(this.getStoredMedals());
 
@@ -33,6 +33,7 @@ class MathGame {
         this.applyTheme();
         this.initEventListeners();
         this.renderMedals();
+        this.updatePlayerLevel();
         this.updateBestScoreUI();
         this.updateMascot(":)", "Vamos, tu puedes con esto.", "");
         this.generateQuestion();
@@ -126,9 +127,62 @@ class MathGame {
             const isUnlocked = this.unlockedMedals.has(medal.id);
             const item = document.createElement("div");
             item.className = `medal-badge ${isUnlocked ? "unlocked" : "locked"}`;
-            item.innerHTML = `${isUnlocked ? "[UNLOCKED]" : "[LOCKED]"} ${medal.title}<span>${medal.hint}</span>`;
+            item.innerHTML = `
+                <div class="medal-icon">${medal.icon}</div>
+                <div class="medal-copy">
+                    ${medal.title}
+                    <span>${medal.hint}</span>
+                </div>
+            `;
             grid.appendChild(item);
         });
+    }
+
+    updatePlayerLevel() {
+        const levelEl = document.getElementById("playerLevel");
+        if (!levelEl) {
+            return;
+        }
+
+        const total = this.medalDefinitions.length;
+        const unlocked = this.unlockedMedals.size;
+
+        let level = "Rookie";
+        if (unlocked >= total) {
+            level = "Legend";
+        } else if (unlocked >= 3) {
+            level = "Pro";
+        } else if (unlocked >= 2) {
+            level = "Hero";
+        } else if (unlocked >= 1) {
+            level = "Explorer";
+        }
+
+        levelEl.textContent = `Nivel: ${level}`;
+    }
+
+    launchConfetti() {
+        const layer = document.getElementById("confettiLayer");
+        if (!layer) {
+            return;
+        }
+
+        const colors = ["#ff7a18", "#ffb347", "#5eead4", "#2b6cb0", "#f87171"];
+        const pieces = 34;
+
+        for (let index = 0; index < pieces; index += 1) {
+            const piece = document.createElement("span");
+            piece.className = "confetti-piece";
+            piece.style.left = `${Math.random() * 100}%`;
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDelay = `${Math.random() * 0.35}s`;
+            piece.style.transform = `rotate(${Math.floor(Math.random() * 320)}deg)`;
+            layer.appendChild(piece);
+
+            setTimeout(() => {
+                piece.remove();
+            }, 1600);
+        }
     }
 
     unlockMedal(medalId) {
@@ -139,8 +193,10 @@ class MathGame {
         this.unlockedMedals.add(medalId);
         this.saveMedals();
         this.renderMedals();
+        this.updatePlayerLevel();
         this.updateMascot("B)", "Nueva medalla desbloqueada!", "cheer");
         this.playMedalSound();
+        this.launchConfetti();
     }
 
     updateMascot(face, text, moodClass) {
