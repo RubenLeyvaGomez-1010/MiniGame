@@ -78,6 +78,7 @@ body.dark-theme {
 .header-top {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     margin-bottom: 10px;
 }
 
@@ -94,6 +95,22 @@ body.dark-theme {
 }
 
 .theme-toggle:hover {
+    transform: translateY(-2px);
+}
+
+.sound-toggle {
+    flex: 0;
+    min-width: 128px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--ink);
+    border: 1px solid rgba(31, 42, 55, 0.2);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    letter-spacing: 0.6px;
+}
+
+.sound-toggle:hover {
     transform: translateY(-2px);
 }
 
@@ -221,6 +238,58 @@ body.dark-theme {
     padding: 28px;
     border-radius: 15px;
     border: 1px solid rgba(31, 42, 55, 0.08);
+}
+
+.mascot-panel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(255, 179, 71, 0.25) 0%, rgba(13, 148, 136, 0.2) 100%);
+    border: 1px solid rgba(31, 42, 55, 0.12);
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.mascot-panel.cheer {
+    animation: mascotPop 0.45s ease;
+}
+
+.mascot-panel.warn {
+    animation: mascotShake 0.4s ease;
+}
+
+.mascot-face {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #2b3a4a;
+    flex-shrink: 0;
+}
+
+.mascot-text {
+    font-size: 0.95rem;
+    color: var(--ink);
+    font-weight: 600;
+    text-align: left;
+}
+
+@keyframes mascotPop {
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@keyframes mascotShake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
 }
 
 .feedback {
@@ -405,6 +474,58 @@ button {
     color: transparent;
 }
 
+.medals-panel {
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(31, 42, 55, 0.12);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(245, 251, 255, 0.95) 100%);
+}
+
+.medals-title {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.medals-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.medal-badge {
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid rgba(43, 58, 74, 0.15);
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #2b3a4a;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.medal-badge span {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.medal-badge.unlocked {
+    border-color: rgba(255, 179, 71, 0.8);
+    background: linear-gradient(135deg, rgba(255, 179, 71, 0.34) 0%, rgba(94, 234, 212, 0.26) 100%);
+    transform: translateY(-1px);
+}
+
+.medal-badge.locked {
+    opacity: 0.55;
+}
+
 @media (max-width: 640px) {
     .container {
         padding: 20px;
@@ -429,12 +550,21 @@ button {
         width: 100%;
     }
 
+    .header-top {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
     .question {
         font-size: 1.95em;
     }
 
     .stats {
         flex-wrap: wrap;
+    }
+
+    .medals-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -471,4 +601,35 @@ body.dark-theme .theme-toggle {
     background: rgba(14, 26, 44, 0.85);
     border-color: rgba(255, 255, 255, 0.2);
     color: var(--ink);
+}
+
+body.dark-theme .sound-toggle {
+    background: rgba(14, 26, 44, 0.85);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--ink);
+}
+
+body.dark-theme .mascot-panel {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: linear-gradient(135deg, rgba(255, 179, 71, 0.2) 0%, rgba(94, 234, 212, 0.16) 100%);
+}
+
+body.dark-theme .mascot-face {
+    background: rgba(16, 30, 50, 0.9);
+    color: #e6eef7;
+}
+
+body.dark-theme .medals-panel {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: linear-gradient(135deg, rgba(15, 28, 45, 0.84) 0%, rgba(10, 24, 37, 0.9) 100%);
+}
+
+body.dark-theme .medal-badge {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e5f0ff;
+}
+
+body.dark-theme .medal-badge.unlocked {
+    background: linear-gradient(135deg, rgba(255, 179, 71, 0.32) 0%, rgba(94, 234, 212, 0.23) 100%);
 }
