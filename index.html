@@ -13,6 +13,9 @@
                 <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar tema">
                     Modo oscuro
                 </button>
+                <button class="sound-toggle" id="soundToggle" type="button" aria-label="Silenciar sonidos">
+                    Sonido: ON
+                </button>
             </div>
             <div class="title">Math Sprint</div>
             <div class="subtitle">Responde rapido, haz rachas y supera tu mejor marca</div>
@@ -57,6 +60,10 @@
         </div>
 
         <div class="game-area">
+            <div class="mascot-panel" id="mascotPanel">
+                <div class="mascot-face" id="mascotFace">:)</div>
+                <div class="mascot-text" id="mascotText">Vamos, tu puedes con esto.</div>
+            </div>
             <div class="feedback empty-feedback" id="feedback"></div>
             <div class="question" id="question">5 + 3</div>
             <div class="input-group">
@@ -86,6 +93,11 @@
                     <div class="stat-value" id="multiplier">x1</div>
                 </div>
             </div>
+        </div>
+
+        <div class="medals-panel">
+            <div class="medals-title">Medallas desbloqueables</div>
+            <div class="medals-grid" id="medalsGrid"></div>
         </div>
     </div>
 

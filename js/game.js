@@ -17,11 +17,24 @@ class MathGame {
         this.isQuestionActive = false;
 
         this.bestScore = this.getStoredBestScore();
+        this.soundEnabled = this.getStoredSoundEnabled();
+        this.audioContext = null;
+
+        this.medalDefinitions = [
+            { id: "first-correct", title: "Primer acierto", hint: "Responde bien 1 vez" },
+            { id: "streak-5", title: "Racha 5", hint: "Consigue 5 aciertos seguidos" },
+            { id: "speedster", title: "Velocista", hint: "Responde con mas del 70% del tiempo" },
+            { id: "perfect-round", title: "Perfecto", hint: "Termina una ronda con 100%" }
+        ];
+        this.unlockedMedals = new Set(this.getStoredMedals());
+
         this.theme = this.getStoredTheme();
 
         this.applyTheme();
         this.initEventListeners();
+        this.renderMedals();
         this.updateBestScoreUI();
+        this.updateMascot(":)", "Vamos, tu puedes con esto.", "");
         this.generateQuestion();
     }
 
@@ -30,6 +43,7 @@ class MathGame {
         document.getElementById("skipBtn").addEventListener("click", () => this.skipQuestion());
         document.getElementById("resetBtn").addEventListener("click", () => this.resetGame());
         document.getElementById("themeToggle").addEventListener("click", () => this.toggleTheme());
+        document.getElementById("soundToggle").addEventListener("click", () => this.toggleSound());
 
         document.getElementById("answer").addEventListener("keypress", (event) => {
             if (event.key === "Enter") {
@@ -51,6 +65,7 @@ class MathGame {
         });
 
         this.updateThemeButtonText();
+        this.updateSoundButtonText();
     }
 
     getStoredBestScore() {
@@ -61,6 +76,165 @@ class MathGame {
 
     saveBestScore() {
         localStorage.setItem("mathGameBestScore", String(this.bestScore));
+    }
+
+    getStoredSoundEnabled() {
+        const soundPreference = localStorage.getItem("mathGameSound");
+        if (soundPreference === "off") {
+            return false;
+        }
+        if (soundPreference === "on") {
+            return true;
+        }
+        return true;
+    }
+
+    saveSoundPreference() {
+        localStorage.setItem("mathGameSound", this.soundEnabled ? "on" : "off");
+    }
+
+    getStoredMedals() {
+        const raw = localStorage.getItem("mathGameMedals");
+        if (!raw) {
+            return [];
+        }
+
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        } catch (error) {
+            return [];
+        }
+
+        return [];
+    }
+
+    saveMedals() {
+        localStorage.setItem("mathGameMedals", JSON.stringify(Array.from(this.unlockedMedals)));
+    }
+
+    renderMedals() {
+        const grid = document.getElementById("medalsGrid");
+        if (!grid) {
+            return;
+        }
+
+        grid.innerHTML = "";
+        this.medalDefinitions.forEach((medal) => {
+            const isUnlocked = this.unlockedMedals.has(medal.id);
+            const item = document.createElement("div");
+            item.className = `medal-badge ${isUnlocked ? "unlocked" : "locked"}`;
+            item.innerHTML = `${isUnlocked ? "[UNLOCKED]" : "[LOCKED]"} ${medal.title}<span>${medal.hint}</span>`;
+            grid.appendChild(item);
+        });
+    }
+
+    unlockMedal(medalId) {
+        if (this.unlockedMedals.has(medalId)) {
+            return;
+        }
+
+        this.unlockedMedals.add(medalId);
+        this.saveMedals();
+        this.renderMedals();
+        this.updateMascot("B)", "Nueva medalla desbloqueada!", "cheer");
+        this.playMedalSound();
+    }
+
+    updateMascot(face, text, moodClass) {
+        const panel = document.getElementById("mascotPanel");
+        const faceEl = document.getElementById("mascotFace");
+        const textEl = document.getElementById("mascotText");
+        if (!panel || !faceEl || !textEl) {
+            return;
+        }
+
+        panel.classList.remove("cheer", "warn");
+        if (moodClass) {
+            panel.classList.add(moodClass);
+            setTimeout(() => panel.classList.remove(moodClass), 520);
+        }
+
+        faceEl.textContent = face;
+        textEl.textContent = text;
+    }
+
+    ensureAudioContext() {
+        if (!this.soundEnabled) {
+            return null;
+        }
+
+        if (!this.audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) {
+                return null;
+            }
+            this.audioContext = new AudioCtx();
+        }
+
+        if (this.audioContext.state === "suspended") {
+            this.audioContext.resume();
+        }
+
+        return this.audioContext;
+    }
+
+    playTone(frequency, duration, type, volume, delaySeconds = 0) {
+        const context = this.ensureAudioContext();
+        if (!context) {
+            return;
+        }
+
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        gain.gain.value = volume;
+
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+
+        const start = context.currentTime + delaySeconds;
+        oscillator.start(start);
+        oscillator.stop(start + duration);
+    }
+
+    playCorrectSound() {
+        this.playTone(620, 0.08, "triangle", 0.06, 0);
+        this.playTone(820, 0.1, "triangle", 0.05, 0.09);
+    }
+
+    playIncorrectSound() {
+        this.playTone(220, 0.12, "sawtooth", 0.05, 0);
+        this.playTone(170, 0.12, "sawtooth", 0.04, 0.11);
+    }
+
+    playMedalSound() {
+        this.playTone(520, 0.08, "sine", 0.06, 0);
+        this.playTone(760, 0.1, "sine", 0.05, 0.09);
+        this.playTone(980, 0.12, "sine", 0.04, 0.2);
+    }
+
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        this.saveSoundPreference();
+        this.updateSoundButtonText();
+        if (this.soundEnabled) {
+            this.playTone(540, 0.07, "triangle", 0.05, 0);
+        }
+    }
+
+    updateSoundButtonText() {
+        const button = document.getElementById("soundToggle");
+        if (!button) {
+            return;
+        }
+
+        button.textContent = this.soundEnabled ? "Sonido: ON" : "Sonido: OFF";
+        button.setAttribute("aria-label", this.soundEnabled ? "Silenciar sonidos" : "Activar sonidos");
     }
 
     getStoredTheme() {
@@ -176,6 +350,8 @@ class MathGame {
         feedback.textContent = "";
         feedback.className = "feedback empty-feedback";
 
+        this.updateMascot(":)", "A pensar rapido...", "");
+
         this.updateProgressUI();
         this.startTimer();
     }
@@ -190,6 +366,8 @@ class MathGame {
 
         if (!Number.isFinite(userAnswer)) {
             this.showFeedback("Ingresa un numero valido", "incorrect");
+            this.updateMascot(":|", "Necesito un numero para ayudarte.", "warn");
+            this.playIncorrectSound();
             return;
         }
 
@@ -202,10 +380,29 @@ class MathGame {
             const points = this.calculatePoints();
             this.score += points;
             this.showFeedback(`Correcto! +${points} puntos`, "correct");
+            this.playCorrectSound();
+
+            if (this.correct === 1) {
+                this.unlockMedal("first-correct");
+            }
+            if (this.streak >= 5) {
+                this.unlockMedal("streak-5");
+            }
+            if (this.timeLeft >= this.timePerQuestion * 0.7) {
+                this.unlockMedal("speedster");
+            }
+
+            if (this.streak >= 6) {
+                this.updateMascot("XD", "Increible racha! Sigue asi!", "cheer");
+            } else {
+                this.updateMascot(":D", "Muy bien! Otra mas!", "cheer");
+            }
         } else {
             this.incorrect += 1;
             this.streak = 0;
             this.showFeedback(`Incorrecto. Era ${this.correctAnswer}`, "incorrect");
+            this.updateMascot(":(", "No pasa nada, intentalo de nuevo.", "warn");
+            this.playIncorrectSound();
         }
 
         this.isQuestionActive = false;
@@ -229,6 +426,8 @@ class MathGame {
         this.isQuestionActive = false;
 
         this.showFeedback(`Saltaste. Era ${this.correctAnswer}`, "incorrect");
+        this.updateMascot(":/", "Saltar tambien es estrategia.", "warn");
+        this.playIncorrectSound();
         this.updateStats();
 
         setTimeout(() => {
@@ -292,6 +491,8 @@ class MathGame {
         this.isQuestionActive = false;
 
         this.showFeedback(`Tiempo agotado. Era ${this.correctAnswer}`, "incorrect");
+        this.updateMascot(":O", "Ups, se acabo el tiempo.", "warn");
+        this.playIncorrectSound();
         this.updateStats();
 
         setTimeout(() => {
@@ -345,6 +546,16 @@ class MathGame {
             "correct"
         );
 
+        if (accuracy === 100 && this.attempts === this.totalQuestionsTarget) {
+            this.unlockMedal("perfect-round");
+        }
+
+        if (accuracy >= 80) {
+            this.updateMascot("B)", "Gran ronda! Eres muy rapido.", "cheer");
+        } else {
+            this.updateMascot(":)", "Buena ronda. Vamos por mas.", "");
+        }
+
         setTimeout(() => {
             const keepPlaying = confirm(
                 "Ronda terminada.\n\nQuieres jugar otra ronda manteniendo tu mejor puntuacion?"
@@ -379,6 +590,7 @@ class MathGame {
         this.streak = 0;
         this.attempts = 0;
         this.updateStats();
+        this.updateMascot(":)", "Nuevo juego, nueva oportunidad.", "");
         this.generateQuestion();
     }
 }
